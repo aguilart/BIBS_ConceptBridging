@@ -16,21 +16,15 @@
 
 #https://docs.google.com/spreadsheets/d/1gSACnoSIBW2Yeaa77o9U_5G2qWclRVb62VosrX4PQ5A/edit#gid=941463247
 
-#Options for visualization are:
-
-#https://www.data-imaginist.com/2017/introducing-tidygraph/
-
-#or: 
-
-#https://cran.r-project.org/web/packages/data.tree/vignettes/data.tree.html
-
-
 #Objectives for the general meeting in September
 
 #1. Show other how we have categorized the concepts of BIBS and visualize it
 
 #2. In general, to show which drivers or aspects of response are over or under-represented in BIBS
 # and also which concepts are under or over respresented (concepts from the different references we use)
+
+devtools::install_github("AdeelK93/collapsibleTree")
+
 
 library(data.tree)
 library(tidyverse)
@@ -47,9 +41,12 @@ haber<-function(x){if(!is.na(x)){
     )}else{x<-x}
 }else{x<-x}
 }
+#############################################################################################
+###############Data assembly#################################################################
+#############################################################################################
+
 
 #Loading the files as csv directly from the googletable
-#OriginalConceptBridging<-ConceptBridiging
 
 ConceptBridiging<-
                   read.csv("ProjectsData/20170210Synthesis_database_MasahirosDriveVersionProject_list_Concepts.csv",
@@ -170,12 +167,10 @@ ConceptBridiging<-cbind(ConceptBridiging,concepts_SW,concepts_V,people)
                 #originalConceptBridging<-ConceptBridiging
 
 
-devtools::install_github("AdeelK93/collapsibleTree")
-
-
-
-##############################################################################
-#Trying new things
+#############################################################################################
+######Collapsible trees visualization (however we agreed on Feb 2019 not to focuse on this###
+#ones any more)##############################################################################
+                
 BIBS_projects_as_Vellend<-
 ConceptBridiging%>%
   filter(!is.na(Community_Process))%>%
@@ -218,8 +213,11 @@ BIBS_projects_as_Scheiner_Willig<-
     tooltip = T,
     collapsed = TRUE
   )
+#############################################################################################
+#################################NETWORK GRAPHS##############################################
+#############################################################################################
 
-
+#Transforming the table into the right format
 ConceptsMatrixFormat<-
                     ConceptBridiging%>%
                       group_by(Person,Theory) %>%
@@ -236,6 +234,10 @@ ConceptsMatrixFormat_net<-graph_from_incidence_matrix(ConceptsMatrixFormat)
                           V(ConceptsMatrixFormat_net)$color <- c("orange", "steel blue")[V(ConceptsMatrixFormat_net)$type+1]
                           V(ConceptsMatrixFormat_net)$shape <- c("circle", "square")[V(ConceptsMatrixFormat_net)$type+1]
                           V(ConceptsMatrixFormat_net$label.cex = 2)
+                          
+                          
+                          
+                          ######Plotting the network###############
                           plot(ConceptsMatrixFormat_net,vertex.label.cex=1)
                           #With tkplot I can interactively change the position and aspects for this network graph
                           tkplot(ConceptsMatrixFormat_net,vertex.label.cex=2.5)
